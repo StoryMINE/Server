@@ -84,7 +84,6 @@ var App = Express();
 Mongoose.connect(secrets.database.connection, {
     user: secrets.database.username,
     pass: secrets.database.password,
-    auth: {authdb: "admin"},
     useMongoClient: true
 }); // connect to our database
 
