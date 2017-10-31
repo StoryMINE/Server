@@ -191,7 +191,7 @@ function allReadings(req, res, next) {
         return next(error);
     }
 
-    CoreSchema.Reading.find({"storyId": storyId}, function (err, readings) {
+    CoreSchema.StoryInstance.find({"storyId": storyId}, function (err, readings) {
         if (err) {
             return next(err);
         }
@@ -210,7 +210,7 @@ function allReadingsForUser(req, res, next) {
         return next(error);
     }
 
-    CoreSchema.Reading.find({"storyId": storyId, "userId": userId}, function (err, readings) {
+    CoreSchema.StoryInstance.find({"storyId": storyId, "userId": userId}, function (err, readings) {
         if (err) {
             return next(err);
         }

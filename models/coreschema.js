@@ -97,7 +97,6 @@ var Function = new Schema({
     conditions: [{type: String, ref: 'Condition'}],
 });
 
-
 // Story ----------------------------------------------------------------------
 
 var Story = new Schema({
@@ -141,22 +140,41 @@ var Variable = new Schema({
     value: Schema.Types.Mixed
 });
 
-// Reading --------------------------------------------------------------------
+// State ----------------------------------------------------------------------
 
-var Reading = new Schema({
+var State = new Schema({
+    name: {type: String, required: true },
+    variables: [Variable]
+});
+
+var Role = new Schema({
+    name: {type: String, required: true },
+    synchronicity: String
+});
+
+// Reader ---------------------------------------------------------------------
+
+var Reader = new Schema({
+    role: Role,
+    personalState: State
+});
+
+// StoryInstance --------------------------------------------------------------------
+
+var StoryInstance = new Schema({
     name: String,
     storyId: String,
-    userId: String,
-    variables: [Variable],
+    readers: [Reader],
+    sharedStates: [Variable],
     state: String,
     timestamp: Number
 });
 
-Reading.virtual('id').get(function () {
+StoryInstance.virtual('id').get(function () {
     return this._id.toHexString();
 });
 
-Reading.set('toJSON', {
+StoryInstance.set('toJSON', {
     virtuals: true
 });
 
@@ -232,7 +250,7 @@ module.exports = {
     Page: mongoose.model('Page', Page),
     Story: mongoose.model('Story', Story),
     Variable: mongoose.model('Variable', Variable),
-    Reading: mongoose.model('Reading', Reading),
+    StoryInstance: mongoose.model('StoryInstance', StoryInstance),
     LogEvent: mongoose.model('LogEvent', LogEvent),
     Function: mongoose.model('Function', Function),
     Location: mongoose.model('Location', Location),

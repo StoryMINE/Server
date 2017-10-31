@@ -55,7 +55,7 @@ if (process.env.NODE_ENV !== 'test') {
 
 if (!file.isDirectoryOK(file.authoringMediaFolder()) || !file.isDirectoryOK(file.readingMediaFolder())) {
     console.log("Authoring: ", file.authoringMediaFolder());
-    console.log("Reading: ", file.readingMediaFolder());
+    console.log("StoryInstance: ", file.readingMediaFolder());
 
     console.log("Please ensure the media folders both exist and have appropriate permissions");
     process.exit(1);
