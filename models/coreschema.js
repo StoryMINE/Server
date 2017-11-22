@@ -64,6 +64,7 @@ var Page = new Schema({
     content: {type: String},
     name: {type: String, required: true},
     pageTransition: {type: String, required: true},
+    messageToObservers: {type: String},
     conditions: [{type: String, ref: 'Schema.Types.Mixed'}],
     functions: [{type: String, ref: 'Function'}],
     hint: {
@@ -121,7 +122,9 @@ var Story = new Schema({
         logLocations: Boolean
     },
     schemaVersion: String,
-    audience: {type: String, required: true}
+    audience: {type: String, required: true},
+
+    instances: [{type: Schema.Types.ObjectId, ref: 'StoryInstance'}]
 });
 
 Story.virtual('id').get(function () {
@@ -162,8 +165,8 @@ var Reader = new Schema({
 // StoryInstance --------------------------------------------------------------------
 
 var StoryInstance = new Schema({
-    name: String,
-    storyId: String,
+    name: {type: String, required: true},
+    storyId: {type: String, required: true},
     readers: [Reader],
     sharedStates: [Variable],
     state: String,
