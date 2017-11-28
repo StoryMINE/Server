@@ -57,6 +57,29 @@ User.set('toJSON', {
     virtuals: true
 });
 
+// Variable -------------------------------------------------------------------
+
+var Variable = new Schema({
+    id: String,
+    key: String,
+    value: Schema.Types.Mixed
+});
+
+// State ----------------------------------------------------------------------
+
+var State = new Schema({
+    name: {type: String, required: true },
+    variables: [Variable]
+});
+
+
+// Role -----------------------------------------------------------------------
+
+var Role = new Schema({
+    name: {type: String, required: true },
+    required: String
+});
+
 // Page -----------------------------------------------------------------------
 
 var Page = new Schema({
@@ -87,102 +110,10 @@ var Location = new Schema({
     radius: Number
 });
 
-// Function -------------------------------------------------------------------
-
-var Function = new Schema({
-    id: {type: String, required: true},
-    type: {type: String, required: true},
-    variable: {type: String}, // for non chain functions
-    value: {type: String, required: false},
-    functions: [{type: String, ref: 'Function'}], // For chain functions
-    conditions: [{type: String, ref: 'Condition'}],
-});
-
-// Story ----------------------------------------------------------------------
-
-var Story = new Schema({
-    name: {type: String, required: true},
-    pages: [Page],
-    roles: [Role],
-    locations: [Location],
-    conditions: [Schema.Types.Mixed],
-    functions: [Function],
-    pagesviewmode: String,
-    description: String,
-    author: String,
-    cachedMediaIds: [String],
-    publishState: {type: String, required: true},
-    publishDate: String,
-    tags: [String],
-    pagesMapViewSettings: {
-        map: Boolean,
-        pageArrows: Boolean,
-        pageDistance: Boolean
-    },
-    storyOptions: {
-        logLocations: Boolean
-    },
-    schemaVersion: String,
-    audience: {type: String, required: true},
-
-    // Runtime state
-    global_states: [State],
-    instances: [{type: Schema.Types.ObjectId, ref: 'StoryInstance'}]
-});
-
-Story.virtual('id').get(function () {
-    return this._id.toHexString();
-});
-
-Story.set('toJSON', {
-    virtuals: true
-});
-
-// Variable -------------------------------------------------------------------
-
-var Variable = new Schema({
-    id: String,
-    key: String,
-    value: Schema.Types.Mixed
-});
-
-// State ----------------------------------------------------------------------
-
-var State = new Schema({
-    name: {type: String, required: true },
-    variables: [Variable]
-});
-
-// Role -----------------------------------------------------------------------
-
-var Role = new Schema({
-    name: {type: String, required: true },
-    required: String
-});
-
 // Reader ---------------------------------------------------------------------
 
 var Reader = new Schema({
     role: Role
-});
-
-// StoryInstance --------------------------------------------------------------
-
-var StoryInstance = new Schema({
-    name: {type: String, required: true},
-    storyId: {type: String, required: true},
-    readers: [Reader],
-    sharedStates: [Variable],
-    state: String,
-    timestamp: Number
-});
-
-StoryInstance.virtual('id').get(function () {
-    return this._id.toHexString();
-});
-
-StoryInstance.set('toJSON', {
-    virtuals: true
 });
 
 // LogEvent --------------------------------------------------------------------
@@ -202,7 +133,16 @@ LogEvent.set('toJSON', {
     virtuals: true
 });
 
+// Function -------------------------------------------------------------------
 
+var Function = new Schema({
+    id: {type: String, required: true},
+    type: {type: String, required: true},
+    variable: {type: String}, // for non chain functions
+    value: {type: String, required: false},
+    functions: [{type: String, ref: 'Function'}], // For chain functions
+    conditions: [{type: String, ref: 'Condition'}],
+});
 
 
 // Comparison Condition -------------------------------------------------------
@@ -247,6 +187,66 @@ var CheckCondition = new Schema({
     name: {type: String, required: true},
     type: {type: String, default: "check"},
     variable: {type: String, ref: 'Variable'}
+});
+
+// Story ----------------------------------------------------------------------
+
+var Story = new Schema({
+    name: {type: String, required: true},
+    pages: [Page],
+    roles: [Role],
+    locations: [Location],
+    conditions: [Schema.Types.Mixed],
+    functions: [Function],
+    pagesviewmode: String,
+    description: String,
+    author: String,
+    cachedMediaIds: [String],
+    publishState: {type: String, required: true},
+    publishDate: String,
+    tags: [String],
+    pagesMapViewSettings: {
+        map: Boolean,
+        pageArrows: Boolean,
+        pageDistance: Boolean
+    },
+    storyOptions: {
+        logLocations: Boolean
+    },
+    schemaVersion: String,
+    audience: {type: String, required: true},
+
+    // Runtime state
+    global_states: [State],
+    instances: [{type: Schema.Types.ObjectId, ref: 'StoryInstance'}]
+});
+
+Story.virtual('id').get(function () {
+    return this._id.toHexString();
+});
+
+Story.set('toJSON', {
+    virtuals: true
+});
+
+
+// StoryInstance --------------------------------------------------------------
+
+var StoryInstance = new Schema({
+    name: {type: String, required: true},
+    storyId: {type: String, required: true},
+    readers: [Reader],
+    sharedStates: [Variable],
+    state: String,
+    timestamp: Number
+});
+
+StoryInstance.virtual('id').get(function () {
+    return this._id.toHexString();
+});
+
+StoryInstance.set('toJSON', {
+    virtuals: true
 });
 
 
