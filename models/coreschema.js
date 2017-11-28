@@ -65,6 +65,14 @@ var Variable = new Schema({
     value: Schema.Types.Mixed
 });
 
+// Variable reference ---------------------------------------------------------
+
+var VariableReference = new Schema({
+    namespace: String,
+    variable: String,
+    scope: String
+});
+
 // State ----------------------------------------------------------------------
 
 var State = new Schema({
@@ -138,7 +146,7 @@ LogEvent.set('toJSON', {
 var Function = new Schema({
     id: {type: String, required: true},
     type: {type: String, required: true},
-    variable: {type: String}, // for non chain functions
+    variable: VariableReference, // for non chain functions
     value: {type: String, required: false},
     functions: [{type: String, ref: 'Function'}], // For chain functions
     conditions: [{type: String, ref: 'Condition'}],
