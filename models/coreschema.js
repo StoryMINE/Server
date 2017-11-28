@@ -103,6 +103,7 @@ var Function = new Schema({
 var Story = new Schema({
     name: {type: String, required: true},
     pages: [Page],
+    roles: [Role],
     locations: [Location],
     conditions: [Schema.Types.Mixed],
     functions: [Function],
@@ -124,6 +125,8 @@ var Story = new Schema({
     schemaVersion: String,
     audience: {type: String, required: true},
 
+    // Runtime state
+    global_states: [State],
     instances: [{type: Schema.Types.ObjectId, ref: 'StoryInstance'}]
 });
 
@@ -150,19 +153,20 @@ var State = new Schema({
     variables: [Variable]
 });
 
+// Role -----------------------------------------------------------------------
+
 var Role = new Schema({
     name: {type: String, required: true },
-    synchronicity: String
+    required: String
 });
 
 // Reader ---------------------------------------------------------------------
 
 var Reader = new Schema({
-    role: Role,
-    personalState: State
+    role: Role
 });
 
-// StoryInstance --------------------------------------------------------------------
+// StoryInstance --------------------------------------------------------------
 
 var StoryInstance = new Schema({
     name: {type: String, required: true},
