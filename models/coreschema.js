@@ -227,7 +227,7 @@ var Story = new Schema({
     audience: {type: String, required: true},
 
     // Runtime state
-    global_states: [State],
+    globalStates: [State],
     instances: [{type: Schema.Types.ObjectId, ref: 'StoryInstance'}]
 });
 
