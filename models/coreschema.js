@@ -160,9 +160,9 @@ var ComparisonCondition = new Schema({
     name: {type: String, required: true},
     type: {type: String, default: "comparison", required: true},
     operand: {type: String, required: true},
-    a: {type: String, required: true},
+    a: {type: Schema.Types.Mixed, required: true},
     aType: {type: String, required: true},
-    b: {type: String, required: true},
+    b: {type: Schema.Types.Mixed, required: true},
     bType: {type: String, required: true}
 });
 
@@ -194,7 +194,7 @@ var CheckCondition = new Schema({
     id: {type: String, required: true},
     name: {type: String, required: true},
     type: {type: String, default: "check"},
-    variable: {type: String, ref: 'Variable'}
+    variable: {type: VariableReference}
 });
 
 // Story ----------------------------------------------------------------------
@@ -244,7 +244,7 @@ var StoryInstance = new Schema({
     name: {type: String, required: true},
     storyId: {type: String, required: true},
     readers: [Reader],
-    sharedStates: [Variable],
+    sharedStates: [State],
     state: String,
     timestamp: Number
 });
@@ -273,6 +273,5 @@ module.exports = {
     LogicalCondition: mongoose.model('LogicalCondition', LogicalCondition),
     LocationCondition: mongoose.model('LocationCondition', LocationCondition),
     CheckCondition: mongoose.model('CheckCondition', CheckCondition)
-
 };
 
