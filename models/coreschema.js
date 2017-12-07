@@ -160,8 +160,10 @@ var ComparisonCondition = new Schema({
     name: {type: String, required: true},
     type: {type: String, default: "comparison", required: true},
     operand: {type: String, required: true},
+    //String or VariableReference
     a: {type: Schema.Types.Mixed, required: true},
     aType: {type: String, required: true},
+    //String or VariableReference
     b: {type: Schema.Types.Mixed, required: true},
     bType: {type: String, required: true}
 });
