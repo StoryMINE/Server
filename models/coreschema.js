@@ -85,7 +85,7 @@ var State = new Schema({
 
 var Role = new Schema({
     name: {type: String, required: true },
-    required: String
+    required: Boolean
 });
 
 // Page -----------------------------------------------------------------------
