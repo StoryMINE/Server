@@ -59,8 +59,53 @@ exports.createPreview = createPreview;
 function create(req, res, next) {
 
     let requestBody = helpers.sanitizeInboundIds(req.body);
+    let story = requestBody;
 
-    var story = new CoreSchema.Story(requestBody);
+    function varStrToVarRef(str) {
+        return {
+            namespace: "this",
+            variable: str,
+            scope: "shared"
+        };
+    }
+
+    function toVarRef(item) {
+        if(typeof(item) === "object") {
+            return item;
+        } else if(typeof(item) === "string") {
+            return varStrToVarRef(item);
+        }
+        throw new Error("Unable to import story - variable neither string nor object");
+    }
+
+    function conditionFormatVarRef(condition) {
+        switch(condition.type) {
+            case "comparison":
+                if(condition.aType === "Variable") {
+                    condition.a = toVarRef(condition.a);
+                }
+                if(condition.bType === "Variable") {
+                    condition.b = toVarRef(condition.b);
+                }
+                break;
+            case "check":
+            case "timepassed":
+                condition.variable = toVarRef(condition.variable);
+                break;
+        }
+    }
+
+    //Story conversion
+        //Functions
+        story.functions = story.functions.map((func) => {
+            func.variable = toVarRef(func.variable);
+            return func;
+        });
+        //Conditions
+        story.conditions.forEach(conditionFormatVarRef);
+    //
+
+    story = new CoreSchema.Story(requestBody);
 
 
     story.save(function (err) {
