@@ -57,7 +57,6 @@ exports.remove = remove;
 exports.createPreview = createPreview;
 
 function create(req, res, next) {
-
     let requestBody = helpers.sanitizeInboundIds(req.body);
     let story = requestBody;
 
@@ -96,13 +95,13 @@ function create(req, res, next) {
     }
 
     //Story conversion
-        //Functions
-        story.functions = story.functions.map((func) => {
-            func.variable = toVarRef(func.variable);
-            return func;
-        });
-        //Conditions
-        story.conditions.forEach(conditionFormatVarRef);
+    //Functions
+    story.functions = story.functions.map((func) => {
+        func.variable = toVarRef(func.variable);
+        return func;
+    });
+    //Conditions
+    story.conditions.forEach(conditionFormatVarRef);
     //
 
     story = new CoreSchema.Story(requestBody);
