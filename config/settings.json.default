@@ -19,5 +19,7 @@
     "mediaPath": "media",
     "authoringMediaPath": "authoring-media",
     "useHttps": false
-  }
+  },
+
+  "schemaPath": "schemas/story.schema.03.draft.json"
 }
