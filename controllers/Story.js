@@ -40,10 +40,14 @@
 
 "use strict";
 
+let Ajv = require('ajv');
+let fs = require('fs');
+
 let CoreSchema = require('../models/coreschema');
 let helpers = require('./helpers.js');
 let fse = require('fs-extra');
 let Media = require('../models/Media.js');
+let settings = require('../config/settings.json');
 let File = require('../utilities/File');
 
 exports.create = create;
@@ -60,6 +64,13 @@ function create(req, res, next) {
 
     let requestBody = helpers.sanitizeInboundIds(req.body);
 
+    let validated = validate(requestBody);
+
+    if(!validated.success) {
+        res.statusCode = 400;
+        return res.send("Story Invalid: Failed to validate. Error was: " + validated.message);
+    }
+
     var story = new CoreSchema.Story(requestBody);
 
 
@@ -74,6 +85,19 @@ function create(req, res, next) {
             story_id: story.id
         });
     });
+}
+
+function validate(story) {
+    let schema = File.loadSchema();
+    if(!schema) {
+        return {success: false, message: "Unable to load schema"};
+    }
+    let ajv = new Ajv();
+    let valid = ajv.validate(schema, story);
+    if(!valid) {
+        return {success: false, message: ajv.errorsText()};
+    }
+    return {success: true};
 }
 
 function index(req, res, next) {
