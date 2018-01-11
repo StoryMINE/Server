@@ -105,8 +105,10 @@ describe('Stories', function () {
                             res.body.should.be.a('object');
 
                             //Response ID changes each submission, remove it
-                            delete res.body.id;
-                            res.body.should.eql(story);
+                            //delete res.body.id;
+                            let story = new CoreSchema.Story(res.body);
+                            let errors = story.validateSync();
+                            chai.assert(!errors);
                             done();
                         });
                 });

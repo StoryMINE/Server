@@ -52,7 +52,7 @@ function create(req, res, next) {
 
     let requestBody = helpers.sanitizeAndValidateInboundIds(undefined, req.body);
 
-    var reading = new CoreSchema.Reading(requestBody);
+    var reading = new CoreSchema.StoryInstance(requestBody);
 
     reading.save(function (err) {
         if (err) {
@@ -69,7 +69,7 @@ function create(req, res, next) {
 }
 
 function index(req, res, next) {
-    CoreSchema.Reading.find(function (err, readings) {
+    CoreSchema.StoryInstance.find(function (err, readings) {
         if (err) {
             return next(err);
         }
@@ -87,7 +87,7 @@ function fetch(req, res, next) {
         return next(error);
     }
 
-    CoreSchema.Reading.findById(readingId, function (err, reading) {
+    CoreSchema.StoryInstance.findById(readingId, function (err, reading) {
         if (err) {
             return next(err);
         }
@@ -95,7 +95,7 @@ function fetch(req, res, next) {
         if (!reading) {
             var error = new Error();
             error.status = 404;
-            error.clientMessage = error.message = "Reading not found";
+            error.clientMessage = error.message = "StoryInstance not found";
             return next(error);
         }
 
@@ -113,8 +113,8 @@ function update(req, res, next) {
         return next(error);
     }
 
-    CoreSchema.Reading.findByIdAndUpdate(readingId, {
-        variables: req.body.variables,
+    CoreSchema.StoryInstance.findByIdAndUpdate(readingId, {
+        sharedStates: req.body.sharedStates,
         state: req.body.state,
         timestamp: req.body.timestamp
     }, {new: true, runValidators: true}, function (err, reading) {

@@ -66,7 +66,7 @@ Router.use(LogRequestToConsole);
 // Test route
 Router.get('/', StaticPages.rootPage);
 
-// Routes for Reading API
+// Routes for StoryInstance API
 
 Router.route('/story')
     .get(Story.index)
@@ -126,7 +126,7 @@ function authoringRouter() {
     AuthoringRouter.use(JwtAuthentication);
     AuthoringRouter.use(IsValidUser);
 
-    // Get a list of pending and published Reading Stories
+    // Get a list of pending and published StoryInstance Stories
     AuthoringRouter.route('/admin/story')
         .get([HasPrivilege(['getReviewStories']), Story.adminindex])
         .put([HasPrivilege(['addReadingStory']), Story.create]);
