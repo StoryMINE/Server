@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "https://storyplaces.soton.ac.uk/schema/03-draft",
+  "schemaVersion": "https://storyplaces.soton.ac.uk/schema/multi/02",
   "tags": [
     "Southampton"
   ],
@@ -1124,5 +1124,11 @@
     "Page_S": "<audio data-media-id='7'></audio><br/><br/>You think that Jack has emptied the Emigrants' Home of all the emigrants except for Golda because he knows the SS Paris is expected tomorrow and this will be Golda's last night in Southampton. (I see you've imagined one of those now or never situations.) You see Golda alone in her dormitory on the second floor humming Tumbalalaika to herself as she pulls a brush through her thick black hair and frets slightly about the cost of that new white nightdress she's wearing. You see Jack climbing the wooden stairs to the second floor – stairs he's not long finished scrubbing - gripping that hideous knife of his in a manner reminiscent of the shower scene in the film Psycho (God Almighty, what an imagination you have!) You imagine that Golda's completely unaware of the danger she's in, but acknowledge (at last) that, if she knew she was home alone with Jack, she would fear for her life, sprint to the sash window, summon every ounce of her strength to throw the damn thing open, gather up the skirt of her nightdress so as not to trip on it and knock herself out (it's clearly a floor-length affair), climb onto the window ledge, step out onto the fire escape ladder that John Doling had bolted to the external wall, and shimmy down the bloody thing like a fire-fighter on a ladder test. Oh, why can't Golda hear Jack's boots upon the floor, dear reader? Why can't Jack have one of his coughing fits?  I think Golda has made it on-board the SS Paris.",
     "Page_T": "<img data-media-id='5' /><br/><br/><img data-media-id='6' /><br/><br/>Yes, I've brought you to dock gate 4 to wave off the SS Paris. It's a beautiful September morning. Sunlight glints off the English Channel and the prevailing breeze isn't disagreeable provided you're wearing a decent hat. Close your eyes and listen to the noises of the dockyard: the honk of a ship, the shouted dialogue of the dockworkers, the thunderous clank of a heavy chain as a vessel is released of its moorings, a constable of the dock police swinging his hand rattle and bellowing for assistance – I don't know if this officer's in the process of apprehending Jack, so please don't ask - a seagull chick crying for a titbit, and a derrick loading coal. How the pervading smell of tar prevents us from smelling the sea! (I know we've smelt worse when Jack's been disinfecting the newly arrived ‘inmates' but I still feel compelled to smother my nose with your handkerchief.) Let us return to Golda. You see her butchered corpse laid out upon a cold mortuary slab awaiting further surgical interference. I, on the other hand, see her quartered with 900 others on board the SS Paris. Since the facilities in steerage are deplorable and the air positively pestilential, I can't pretend that Golda is now free of danger (she might contract cholera.) But before you and I sadly part ways, let's imagine Golda arriving in New York and being welcomed by the ‘Mother of Exiles', the Statue of Liberty. (Rest assured, dear reader, it could happen.)",
     "Finish": "<h3>Thank you for reading one of our stories ...</h3><p>We hope you enjoyed this StoryPlaces story. We would greatly appreciate your opinions on this new approach to story telling. if you have time, filling out the short survey linked below will help us to understand how to improve our application and design new location-aware story experiences. If you would like to do another of our stories please click the StoryPlaces logo in the top left corner and select another story.</p><p><b><a href='https://www.isurvey.soton.ac.uk/20629'>Click Here to take our reader experience survey</a></b></p>"
-  }
+  },
+  "roles": [
+    {
+      "name": "Main Role",
+      "required": true
+    }
+  ]
 }

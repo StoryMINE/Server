@@ -21,5 +21,5 @@
     "useHttps": false
   },
 
-  "schemaPath": "schemas/story.schema.03.draft.json"
+  "schemaPath": "schemas/story.schema.multi.02.json"
 }
