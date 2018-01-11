@@ -67,8 +67,11 @@ function create(req, res, next) {
     let validated = validate(story);
 
     if(!validated.success) {
-        res.statusCode = 400;
-        return res.send("Story Invalid: Failed to validate. Error was: " + validated.message);
+        let err = {
+            status: 400,
+            clientMessage: "Story Invalid: Failed to validate. Error was: " + validated.message
+        };
+        return next(err);
     }
 
     function varStrToVarRef(str) {
