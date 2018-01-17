@@ -238,8 +238,7 @@ var Story = new Schema({
     audience: {type: String, required: true},
 
     // Runtime state
-    globalStates: [State],
-    instances: [{type: Schema.Types.ObjectId, ref: 'StoryInstance'}]
+    globalStates: [State]
 });
 
 Story.virtual('id').get(function () {
