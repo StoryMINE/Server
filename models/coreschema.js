@@ -68,6 +68,8 @@ var Variable = new Schema({
 // Variable reference ---------------------------------------------------------
 
 var VariableReference = new Schema({
+    //ID needed for clientside collections..
+    id: String,
     namespace: String,
     variable: String,
     scope: String
@@ -76,7 +78,7 @@ var VariableReference = new Schema({
 // State ----------------------------------------------------------------------
 
 var State = new Schema({
-    name: {type: String, required: true },
+    id: {type: String, required: true },
     variables: [Variable]
 });
 
@@ -84,7 +86,7 @@ var State = new Schema({
 // Role -----------------------------------------------------------------------
 
 var Role = new Schema({
-    name: {type: String, required: true },
+    id: {type: String, required: true },
     required: Boolean
 });
 
@@ -129,7 +131,8 @@ var Location = new Schema({
 // Reader ---------------------------------------------------------------------
 
 var Reader = new Schema({
-    userId: String,
+    //ID of the user
+    id: String,
     roleName: String
 });
 
