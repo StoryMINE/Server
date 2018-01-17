@@ -1127,7 +1127,7 @@
   },
   "roles": [
     {
-      "name": "Main Role",
+      "id": "Main Role",
       "required": true
     }
   ]
