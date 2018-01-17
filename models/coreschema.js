@@ -68,11 +68,17 @@ var Variable = new Schema({
 // Variable reference ---------------------------------------------------------
 
 var VariableReference = new Schema({
-    //ID needed for clientside collections..
-    id: String,
     namespace: String,
     variable: String,
     scope: String
+});
+
+VariableReference.virtual('id').get(function () {
+    return this.scope + "->" + this.namespace + "->" + this.variable;
+});
+
+VariableReference.set('toJSON', {
+    virtuals: true
 });
 
 // State ----------------------------------------------------------------------
