@@ -62,7 +62,8 @@ function create(req, res, next) {
         }
 
         let toSend = helpers.sanitizeOutboundObject(reading);
-        toSend.variables = toSend.variables.map(variable => helpers.sanitizeOutboundJson(variable));
+        toSend.readers = toSend.readers.map(reader => helpers.sanitizeOutboundJson(reader));
+        toSend.sharedStates = toSend.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
 
         res.json(toSend);
     });
@@ -100,7 +101,8 @@ function fetch(req, res, next) {
         }
 
         let toSend = helpers.sanitizeOutboundObject(reading);
-        toSend.variables = toSend.variables.map(variable => helpers.sanitizeOutboundJson(variable));
+        toSend.readers = toSend.readers.map(reader => helpers.sanitizeOutboundJson(reader));
+        toSend.sharedStates = toSend.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
 
         res.json(toSend);
     });
@@ -114,6 +116,7 @@ function update(req, res, next) {
     }
 
     CoreSchema.StoryInstance.findByIdAndUpdate(readingId, {
+        readers: req.body.readers,
         sharedStates: req.body.sharedStates,
         state: req.body.state,
         timestamp: req.body.timestamp
@@ -130,7 +133,8 @@ function update(req, res, next) {
         }
 
         let toSend = helpers.sanitizeOutboundObject(reading);
-        toSend.variables = toSend.variables.map(variable => helpers.sanitizeOutboundJson(variable));
+        toSend.readers = toSend.readers.map(reader => helpers.sanitizeOutboundJson(reader));
+        toSend.sharedStates = toSend.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
 
         res.json(toSend);
     });
