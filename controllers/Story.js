@@ -281,7 +281,7 @@ function allReadingsForUser(req, res, next) {
         return next(error);
     }
 
-    CoreSchema.StoryInstance.find({"storyId": storyId, "userId": userId}, function (err, readings) {
+    CoreSchema.StoryInstance.find({"storyId": storyId, "readers.userId": userId}, function (err, readings) {
         if (err) {
             return next(err);
         }
