@@ -70,7 +70,7 @@ Router.get('/', StaticPages.rootPage);
 
 Router.route('/story')
     .get(Story.index)
-    .post([AuthenticateUsingToken, Story.create]);
+    .post([Story.create]);
 
 Router.route('/story/:story_id')
     .get(Story.fetch);
@@ -80,17 +80,21 @@ Router.route('/story/:story_id/media/:media_id')
 
 Router.route('/reading')
     .post(Reading.create)
-    .get([AuthenticateUsingToken, Reading.index]);
+    .get([Reading.index]);
 
 Router.route('/reading/story/:story_id/user/:user_id')
     .get(Story.readingsForUser);
 
 Router.route('/reading/story/:story_id')
-    .get([AuthenticateUsingToken, Story.allReadings]);
+    .get([Story.allReadings]);
 
 Router.route('/reading/:reading_id')
     .get(Reading.fetch)
     .put(Reading.update);
+
+Router.route('/state/:reading_id')
+    .get(Reading.getStates)
+    .put(Reading.updateStates);
 
 Router.route('/logevent')
     .post(LogEvent.create)

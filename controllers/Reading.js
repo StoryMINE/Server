@@ -47,6 +47,8 @@ exports.create = create;
 exports.index = index;
 exports.update = update;
 exports.fetch = fetch;
+exports.getStates = getStates;
+exports.updateStates = updateStates;
 
 function create(req, res, next) {
 
@@ -135,6 +137,65 @@ function update(req, res, next) {
         let toSend = helpers.sanitizeOutboundObject(reading);
         toSend.readers = toSend.readers.map(reader => helpers.sanitizeOutboundJson(reader));
         toSend.sharedStates = toSend.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
+
+        res.json(toSend);
+    });
+}
+
+function getStates(req, res, next) {
+    try {
+        var readingId = helpers.validateId(req.params.reading_id);
+    } catch (error) {
+        return next(error);
+    }
+
+    CoreSchema.StoryInstance.findById(readingId, function (err, reading) {
+        if (err) {
+            return next(err);
+        }
+
+        if (!reading) {
+            var error = new Error();
+            error.status = 404;
+            error.clientMessage = error.message = "StoryInstance not found";
+            return next(error);
+        }
+
+        let toSend = reading.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
+
+        res.json(toSend);
+    });
+}
+
+function updateStates(req, res, next) {
+    if(typeof req.body !== "object" || !Array.isArray(req.body.sharedStates)) {
+        let error = new Error();
+        error.status = 400;
+        error.clientMessage = error.message = "Invalid state passed";
+        return next(error);
+    }
+
+    try {
+        var readingId = helpers.validateId(req.params.reading_id);
+    } catch (error) {
+        return next(error);
+    }
+
+    CoreSchema.StoryInstance.findByIdAndUpdate(readingId, {
+        sharedStates: req.body.sharedStates
+    }, {new: true, runValidators: true}, function (err, reading) {
+        if (err) {
+            return next(err);
+        }
+
+        if (!reading) {
+            var error = new Error();
+            error.status = 400;
+            error.clientMessage = error.message = "Unable To update reading";
+            return next(error);
+        }
+
+        let toSend = reading.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
 
         res.json(toSend);
     });
