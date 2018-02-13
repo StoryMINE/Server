@@ -92,7 +92,7 @@ Router.route('/reading/:reading_id')
     .get(Reading.fetch)
     .put(Reading.update);
 
-Router.route('/state/:reading_id')
+Router.route('/states/:reading_id')
     .get(Reading.getStates)
     .put(Reading.updateStates);
 
