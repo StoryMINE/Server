@@ -161,7 +161,11 @@ function getStates(req, res, next) {
             return next(error);
         }
 
-        let toSend = reading.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
+        let sharedStates = reading.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
+        let toSend = {
+            shared: sharedStates,
+            global: []
+        };
 
         res.json(toSend);
     });
