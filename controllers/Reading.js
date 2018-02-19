@@ -65,7 +65,6 @@ function create(req, res, next) {
 
         let toSend = helpers.sanitizeOutboundObject(reading);
         toSend.readers = toSend.readers.map(reader => helpers.sanitizeOutboundJson(reader));
-        toSend.sharedStates = toSend.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
 
         res.json(toSend);
     });
@@ -104,7 +103,6 @@ function fetch(req, res, next) {
 
         let toSend = helpers.sanitizeOutboundObject(reading);
         toSend.readers = toSend.readers.map(reader => helpers.sanitizeOutboundJson(reader));
-        toSend.sharedStates = toSend.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
 
         res.json(toSend);
     });
@@ -119,7 +117,6 @@ function update(req, res, next) {
 
     CoreSchema.StoryInstance.findByIdAndUpdate(readingId, {
         readers: req.body.readers,
-        sharedStates: req.body.sharedStates,
         state: req.body.state,
         timestamp: req.body.timestamp
     }, {new: true, runValidators: true}, function (err, reading) {
@@ -136,7 +133,6 @@ function update(req, res, next) {
 
         let toSend = helpers.sanitizeOutboundObject(reading);
         toSend.readers = toSend.readers.map(reader => helpers.sanitizeOutboundJson(reader));
-        toSend.sharedStates = toSend.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
 
         res.json(toSend);
     });
@@ -149,22 +145,16 @@ function getStates(req, res, next) {
         return next(error);
     }
 
-    CoreSchema.StoryInstance.findById(readingId, function (err, reading) {
+    CoreSchema.StateScope.findOne({readingId: readingId}, function (err, stateScope) {
         if (err) {
             return next(err);
         }
 
-        if (!reading) {
-            var error = new Error();
-            error.status = 404;
-            error.clientMessage = error.message = "StoryInstance not found";
-            return next(error);
-        }
+        let defaultSharedScope = new CoreSchema.StateScope({readingId: readingId});
 
-        let sharedStates = reading.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
         let toSend = {
-            shared: sharedStates,
-            global: []
+            shared: stateScope || defaultSharedScope,
+            global: {storyId: "1234", states: [], revision: 0}
         };
 
         res.json(toSend);
@@ -185,21 +175,19 @@ function updateStates(req, res, next) {
         return next(error);
     }
 
-    CoreSchema.StoryInstance.findByIdAndUpdate(readingId, {
+    CoreSchema.StoryInstance.findOneAndUpdate({readingId: readingId}, {
         sharedStates: req.body.sharedStates
-    }, {new: true, runValidators: true}, function (err, reading) {
+    }, {new: true, runValidators: true}, function (err, stateScope) {
         if (err) {
             return next(err);
         }
 
-        if (!reading) {
-            var error = new Error();
-            error.status = 400;
-            error.clientMessage = error.message = "Unable To update reading";
-            return next(error);
-        }
+        let defaultSharedScope = new CoreSchema.StateScope({readingId: readingId});
 
-        let toSend = reading.sharedStates.map(state => helpers.sanitizeOutboundJson(state));
+        let toSend = {
+            shared: stateScope || defaultSharedScope,
+            global: {storyId: "1234", states: [], revision: 0}
+        };
 
         res.json(toSend);
     });

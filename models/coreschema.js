@@ -245,9 +245,6 @@ var Story = new Schema({
     },
     schemaVersion: String,
     audience: {type: String, required: true},
-
-    // Runtime state
-    globalStates: [State]
 });
 
 Story.virtual('id').get(function () {
@@ -258,13 +255,23 @@ Story.set('toJSON', {
     virtuals: true
 });
 
+// State Collection
+
+var StateScope = new Schema({
+    //Set if this state is associated with a reading (shared)
+    readingId: {type: String, required: true},
+    //Set if this state is associated with a story (global)
+    storyId: {type: String, require: true},
+    states: [State],
+    revision: {type: Number, default: 0}
+});
+
 // StoryInstance --------------------------------------------------------------
 
 var StoryInstance = new Schema({
     name: {type: String, required: true},
     storyId: {type: String, required: true},
     readers: [Reader],
-    sharedStates: [State],
     state: String,
     timestamp: Number
 });
@@ -292,6 +299,7 @@ module.exports = {
     ComparisonCondition: mongoose.model('ComparisonCondition', ComparisonCondition),
     LogicalCondition: mongoose.model('LogicalCondition', LogicalCondition),
     LocationCondition: mongoose.model('LocationCondition', LocationCondition),
-    CheckCondition: mongoose.model('CheckCondition', CheckCondition)
+    CheckCondition: mongoose.model('CheckCondition', CheckCondition),
+    StateScope: mongoose.model('StateScope', StateScope)
 };
 
