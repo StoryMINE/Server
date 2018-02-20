@@ -162,7 +162,9 @@ function getStates(req, res, next) {
 }
 
 function updateStates(req, res, next) {
-    if(typeof req.body !== "object" || !Array.isArray(req.body.sharedStates)) {
+    console.log(req.body);
+
+    if(typeof req.body !== "object" || !Array.isArray(req.body.states)) {
         let error = new Error();
         error.status = 400;
         error.clientMessage = error.message = "Invalid state passed";
@@ -170,18 +172,19 @@ function updateStates(req, res, next) {
     }
 
     try {
-        var readingId = helpers.validateId(req.params.reading_id);
+        var readingId = helpers.validateId(req.body.readingId);
     } catch (error) {
         return next(error);
     }
 
-    CoreSchema.StoryInstance.findOneAndUpdate({readingId: readingId}, {
-        sharedStates: req.body.sharedStates
-    }, {new: true, runValidators: true}, function (err, stateScope) {
+    CoreSchema.StateScope.findOneAndUpdate({readingId: readingId}, {
+        states: req.body.states,
+    }, {upsert: true, new: true, runValidators: true}, function (err, stateScope) {
         if (err) {
             return next(err);
         }
 
+        console.log("Replying with", stateScope);
         let defaultSharedScope = new CoreSchema.StateScope({readingId: readingId});
 
         let toSend = {
