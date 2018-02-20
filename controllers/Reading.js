@@ -177,21 +177,26 @@ function updateStates(req, res, next) {
         return next(error);
     }
 
-    CoreSchema.StateScope.findOneAndUpdate({readingId: readingId}, {
-        states: req.body.states,
-    }, {upsert: true, new: true, runValidators: true}, function (err, stateScope) {
-        if (err) {
-            return next(err);
-        }
+    CoreSchema.StateScope.findOne({readingId: readingId})
+      .then((stateScope) => {
+          //TODO: If collision detection reject
+          return CoreSchema.StateScope.findOneAndUpdate({
+              readingId: readingId
+          }, {
+              states: req.body.states
+          }, {upsert: true, new: true, runValidators: true}
+          ).then((stateScope) => {
+              let defaultSharedScope = new CoreSchema.StateScope({readingId: readingId});
 
-        console.log("Replying with", stateScope);
-        let defaultSharedScope = new CoreSchema.StateScope({readingId: readingId});
+              let toSend = {
+                  collision: false,
+                  scopes: {
+                      shared: stateScope || defaultSharedScope,
+                      global: {storyId: "1234", states: [], revision: 0}
+                  },
+              };
 
-        let toSend = {
-            shared: stateScope || defaultSharedScope,
-            global: {storyId: "1234", states: [], revision: 0}
-        };
-
-        res.json(toSend);
+              res.json(toSend);
+          });
     });
 }
