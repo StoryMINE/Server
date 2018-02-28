@@ -61,7 +61,6 @@ User.set('toJSON', {
 
 var Variable = new Schema({
     id: String,
-    key: String,
     value: Schema.Types.Mixed
 });
 
