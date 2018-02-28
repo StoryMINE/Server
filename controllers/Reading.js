@@ -39,6 +39,7 @@
  ***************************************************************************** */
 
 "use strict";
+var crypto = require('crypto');
 
 var CoreSchema = require('../models/coreschema');
 var helpers = require('./helpers.js');
@@ -159,6 +160,24 @@ function getStates(req, res, next) {
 
         res.json(toSend);
     });
+}
+
+function hashVariable(namespace, key, value) {
+    return [namespace, key, value].join("->");
+}
+
+function hashScope(scope) {
+    let toHash = scope.states.reduce((result, state) => {
+        return result.concat(state.variables.reduce((variableHashes, variable) => {
+            variableHashes.push(hashVariable(state.id, variable.id, variable.value));
+            return variableHashes;
+        }, []));
+    }, []).join(":");
+
+    let hash = crypto.createHash("MD5");
+    hash.update(toHash);
+
+    return hash.digest('hex');
 }
 
 function updateStates(req, res, next) {
