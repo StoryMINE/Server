@@ -180,10 +180,15 @@ function hashScope(scope) {
     return hash.digest('hex');
 }
 
+function isValidScope(scope) {
+    if(typeof scope !== "object") { return false }
+    return Array.isArray(scope.states);
+}
+
 function updateStates(req, res, next) {
     console.log(req.body);
 
-    if(typeof req.body !== "object" || !Array.isArray(req.body.states)) {
+    if(typeof req.body !== "object" || !isValidScope(req.body.shared) || !isValidScope(req.body.global)) {
         let error = new Error();
         error.status = 400;
         error.clientMessage = error.message = "Invalid state passed";
@@ -191,7 +196,7 @@ function updateStates(req, res, next) {
     }
 
     try {
-        var readingId = helpers.validateId(req.body.readingId);
+        var readingId = helpers.validateId(req.body.shared.readingId);
     } catch (error) {
         return next(error);
     }
@@ -201,9 +206,7 @@ function updateStates(req, res, next) {
           //TODO: If collision detection reject
           return CoreSchema.StateScope.findOneAndUpdate({
               readingId: readingId
-          }, {
-              states: req.body.states
-          }, {upsert: true, new: true, runValidators: true}
+          }, req.body.shared, {upsert: true, new: true, runValidators: true}
           ).then((stateScope) => {
               let defaultSharedScope = new CoreSchema.StateScope({readingId: readingId});
 
