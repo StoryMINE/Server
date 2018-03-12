@@ -181,7 +181,7 @@ function hashScope(scope) {
 }
 
 function isValidScope(scope) {
-    if(typeof scope !== "object") { return false }
+    if(typeof scope !== "object") { return false; }
     return Array.isArray(scope.states);
 }
 
@@ -201,19 +201,37 @@ function updateStates(req, res, next) {
         return next(error);
     }
 
+    //req.body.shared.revision = hashScope(req.body.shared);
+
+
     CoreSchema.StateScope.findOne({readingId: readingId})
-      .then((stateScope) => {
-          //TODO: If collision detection reject
+      .then((serverSharedScope) => {
+          console.log("Server revision: " + serverSharedScope.revision);
+          console.log("Update revision: " + req.body.shared.revision);
+          if(serverSharedScope.revision !== req.body.shared.revision) {
+              console.log("WARNING: Collision");
+              return res.json({
+                  collision: true,
+                  scopes: {
+                      shared: serverSharedScope,
+                      global: {storyId: "1234", states: [], revision: 0}
+                  }
+              });
+          } else {
+              //If it's a valid update, we need to update the revision before saving/
+              req.body.shared.revision = hashScope(req.body.shared);
+          }
+
           return CoreSchema.StateScope.findOneAndUpdate({
               readingId: readingId
           }, req.body.shared, {upsert: true, new: true, runValidators: true}
-          ).then((stateScope) => {
+          ).then((updatedStateScope) => {
               let defaultSharedScope = new CoreSchema.StateScope({readingId: readingId});
 
               let toSend = {
                   collision: false,
                   scopes: {
-                      shared: stateScope || defaultSharedScope,
+                      shared: updatedStateScope || defaultSharedScope,
                       global: {storyId: "1234", states: [], revision: 0}
                   },
               };

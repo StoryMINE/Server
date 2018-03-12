@@ -260,9 +260,9 @@ var StateScope = new Schema({
     //Set if this state is associated with a reading (shared)
     readingId: {type: String, required: true},
     //Set if this state is associated with a story (global)
-    storyId: {type: String, require: true},
+    storyId: {type: String, required: true},
     states: [State],
-    revision: {type: Number, default: 0}
+    revision: {type: String, default: ""}
 });
 
 // StoryInstance --------------------------------------------------------------
