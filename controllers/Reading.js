@@ -206,21 +206,24 @@ function updateStates(req, res, next) {
 
     CoreSchema.StateScope.findOne({readingId: readingId})
       .then((serverSharedScope) => {
-          console.log("Server revision: " + serverSharedScope.revision);
-          console.log("Update revision: " + req.body.shared.revision);
-          if(serverSharedScope.revision !== req.body.shared.revision) {
-              console.log("WARNING: Collision");
-              return res.json({
-                  collision: true,
-                  scopes: {
-                      shared: serverSharedScope,
-                      global: {storyId: "1234", states: [], revision: 0}
-                  }
-              });
-          } else {
-              //If it's a valid update, we need to update the revision before saving/
-              req.body.shared.revision = hashScope(req.body.shared);
-          }
+            if(serverSharedScope) {
+                console.log("Server revision: " + serverSharedScope.revision);
+                console.log("Update revision: " + req.body.shared.revision);
+                if (serverSharedScope.revision !== req.body.shared.revision) {
+                    console.log("WARNING: Collision");
+                    return res.json({
+                        collision: true,
+                        scopes: {
+                            shared: serverSharedScope,
+                            global: {storyId: "1234", states: [], revision: 0}
+                        }
+                    });
+                } else {
+                    //If it's a valid update, we need to update the revision before saving/
+                    req.body.shared.revision = hashScope(req.body.shared);
+                    console.log("New revision: ", req.body.shared.revision);
+                }
+            }
 
           return CoreSchema.StateScope.findOneAndUpdate({
               readingId: readingId
