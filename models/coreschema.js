@@ -262,7 +262,8 @@ var StateScope = new Schema({
     //Set if this state is associated with a story (global)
     storyId: {type: String, required: true},
     states: [State],
-    revision: {type: String, default: ""}
+    revision: {type: String, default: ""},
+    revisionNumber: {type: Number, default: 0}
 });
 
 // StoryInstance --------------------------------------------------------------

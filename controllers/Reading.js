@@ -221,6 +221,7 @@ function updateStates(req, res, next) {
                 } else {
                     //If it's a valid update, we need to update the revision before saving/
                     req.body.shared.revision = hashScope(req.body.shared);
+                    req.body.shared.revisionNumber += 1;
                     console.log("New revision: ", req.body.shared.revision);
                 }
             }
