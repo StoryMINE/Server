@@ -503,6 +503,9 @@
         },
         {
           "$ref": "#/definitions/function-Increment"
+        },
+        {
+          "$ref": "#/definitions/function-SetRole"
         }
       ]
     },
@@ -540,6 +543,39 @@
         "conditions",
         "type",
         "variable",
+        "value"
+      ]
+    },
+    "function-SetRole": {
+      "properties": {
+        "conditions": {
+          "$ref": "#/definitions/conditionsReferenceArray"
+        },
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "setrole"
+          ]
+        },
+        "value": {
+          "type": "string"
+        },
+        "functions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/functionReference"
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "conditions",
+        "type",
         "value"
       ]
     },
