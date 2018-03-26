@@ -111,7 +111,9 @@ function create(req, res, next) {
     //Story conversion
     //Functions
     story.functions = story.functions.map((func) => {
-        func.variable = toVarRef(func.variable);
+        if(func.variable) {
+            func.variable = toVarRef(func.variable);
+        }
         return func;
     });
     //Conditions
