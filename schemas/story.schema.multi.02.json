@@ -242,7 +242,7 @@
               "type": "string",
               "enum": [
                 "global",
-                "instance"
+                "shared"
               ]
             }
           },
