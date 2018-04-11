@@ -265,6 +265,14 @@ var StateScope = new Schema({
     revisionNumber: {type: Number, default: 0}
 });
 
+// State Lock used to allow atomic writes to both Shared and Global scopes
+
+var StateLock = new Schema( {
+    readingId: {type: String, required: true},
+    storyId: {type: String, required: true},
+    lockedBy: {type: String, default: ""}
+});
+
 // StoryInstance --------------------------------------------------------------
 
 var StoryInstance = new Schema({
@@ -299,6 +307,7 @@ module.exports = {
     LogicalCondition: mongoose.model('LogicalCondition', LogicalCondition),
     LocationCondition: mongoose.model('LocationCondition', LocationCondition),
     CheckCondition: mongoose.model('CheckCondition', CheckCondition),
-    StateScope: mongoose.model('StateScope', StateScope)
+    StateScope: mongoose.model('StateScope', StateScope),
+    StateLock: mongoose.model('StateLock', StateLock)
 };
 

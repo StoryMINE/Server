@@ -146,20 +146,26 @@ function getStates(req, res, next) {
         return next(error);
     }
 
-    CoreSchema.StateScope.findOne({readingId: readingId}, function (err, stateScope) {
-        if (err) {
-            return next(err);
-        }
+    let globalScopePromise = CoreSchema.StoryInstance.findById(readingId).then(storyInstance => storyInstance.storyId)
+        .then(storyId => CoreSchema.StateScope.findOne({storyId: storyId}));
 
-        let defaultSharedScope = new CoreSchema.StateScope({readingId: readingId});
+    let sharedScopePromise = CoreSchema.StateScope.findOne({readingId: readingId});
 
-        let toSend = {
-            shared: stateScope || defaultSharedScope,
-            global: {storyId: "1234", states: [], revision: 0}
-        };
+    Promise.all([globalScopePromise, sharedScopePromise])
+        .then(scopes => {
+            var globalScope = scopes[0];
+            var sharedScope = scopes[1];
 
-        res.json(toSend);
-    });
+            //Note: This shouldn't save.
+            let defaultSharedScope = new CoreSchema.StateScope({readingId: readingId});
+            let defaultGlobalScope = new CoreSchema.StateScope({storyId: readingId});
+
+            res.json({
+               shared: sharedScope || defaultSharedScope,
+               global: globalScope || defaultGlobalScope
+            });
+        })
+        .catch(err => next(err));
 }
 
 function hashVariable(namespace, key, value) {
@@ -185,6 +191,39 @@ function isValidScope(scope) {
     return Array.isArray(scope.states);
 }
 
+function getUpdateLock(readingId, storyId, lockId) {
+    return CoreSchema.StateLock.findOneAndUpdate({
+        readingId: readingId,
+        storyId: storyId,
+        lockedBy: ""
+    },
+    {
+        lockedBy: lockId
+    },
+    {
+        upsert: true,
+        new: true
+    })
+    .then(result => result && result.lockedBy === lockId? Promise.resolve() : Promise.reject())
+    .catch(err => Promise.reject(err));
+}
+
+function releaseUpdateLock(readingId, storyId, lockId) {
+    return CoreSchema.StateLock.findOneAndUpdate({
+        readingId: readingId,
+        storyId: storyId,
+        lockedBy: lockId
+    },
+    {
+        lockedBy: ""
+    },
+    {
+        new: true
+    })
+    .then(result => result && result.lockedBy === ""? Promise.resolve() : Promise.reject())
+    .catch(err => Promise.reject(err));
+}
+
 function updateStates(req, res, next) {
     console.log(req.body);
 
@@ -197,50 +236,77 @@ function updateStates(req, res, next) {
 
     try {
         var readingId = helpers.validateId(req.body.shared.readingId);
+        var storyId = helpers.validateId(req.body.global.storyId);
     } catch (error) {
         return next(error);
     }
 
-    //req.body.shared.revision = hashScope(req.body.shared);
+    let lockId = readingId + storyId;
 
-
-    CoreSchema.StateScope.findOne({readingId: readingId})
-      .then((serverSharedScope) => {
-            if(serverSharedScope) {
-                console.log("Server revision: " + serverSharedScope.revision);
+    getUpdateLock(readingId, storyId, lockId).then(() => {
+        CoreSchema.StateScope.find({$or: [{readingId: readingId}, {storyId: storyId}]})
+        .then((stateScopes) => {
+            return {
+                shared: stateScopes.find(scope => scope.readingId === readingId),
+                global: stateScopes.find(scope => scope.storyId === storyId)
+            };
+        })
+        .then(scopes => {
+            if(scopes.shared) {
+                console.log("Server revision: " + scopes.shared.revision);
                 console.log("Update revision: " + req.body.shared.revision);
-                if (serverSharedScope.revision !== req.body.shared.revision) {
-                    console.log("WARNING: Collision");
-                    return res.json({
-                        collision: true,
-                        scopes: {
-                            shared: serverSharedScope,
-                            global: {storyId: "1234", states: [], revision: 0}
-                        }
-                    });
-                } else {
-                    //If it's a valid update, we need to update the revision before saving/
-                    req.body.shared.revision = hashScope(req.body.shared);
-                    req.body.shared.revisionNumber += 1;
-                    console.log("New revision: ", req.body.shared.revision);
-                }
             }
 
-          return CoreSchema.StateScope.findOneAndUpdate({
-              readingId: readingId
-          }, req.body.shared, {upsert: true, new: true, runValidators: true}
-          ).then((updatedStateScope) => {
-              let defaultSharedScope = new CoreSchema.StateScope({readingId: readingId});
+            if (scopes.shared && scopes.shared.revision !== req.body.shared.revision ||
+                scopes.global && scopes.global.revision !== req.body.global.revision)
+            {
+                console.log("WARNING: Collision");
+                return res.json({
+                    collision: true,
+                    scopes: {
+                        shared: scopes.shared,
+                        global: scopes.global
+                    }
+                });
+            } else {
+                //If it's a valid update, we need to update the revision before saving/
+                req.body.shared.revision = hashScope(req.body.shared);
+                req.body.shared.revisionNumber += 1;
 
-              let toSend = {
-                  collision: false,
-                  scopes: {
-                      shared: updatedStateScope || defaultSharedScope,
-                      global: {storyId: "1234", states: [], revision: 0}
-                  },
-              };
+                req.body.global.revision = hashScope(req.body.global);
+                req.body.global.revisionNumber += 1;
+                console.log("New shared revision: ", req.body.shared.revision);
+                console.log("New global revision: ", req.body.global.revision);
+            }
 
-              res.json(toSend);
-          });
+            let updateSharedStatePromise = CoreSchema.StateScope.findOneAndUpdate({
+                    readingId: readingId
+                }, req.body.shared, {upsert: true, new: true, runValidators: true}
+            );
+
+            let updateGlobalStatePromise = CoreSchema.StateScope.findOneAndUpdate({
+                storyId: storyId
+            }, req.body.global, {upsert: true, new: true, runValidators: true});
+
+            return Promise.all([updateSharedStatePromise, updateGlobalStatePromise])
+            .then(results => {
+                let updatedSharedScope = results[0];
+                let updatedGlobalScope = results[1];
+
+                //let defaultSharedScope = new CoreSchema.StateScope({readingId: readingId});
+
+                let toSend = {
+                    collision: false,
+                    scopes: {
+                        shared: updatedSharedScope,// || defaultSharedScope,
+                        global: updatedGlobalScope
+                    },
+                };
+
+                res.json(toSend);
+            });
+        })
+        .then(_ => releaseUpdateLock(readingId, storyId, lockId))
+        .catch(_ => console.log("Failed to get update lock."));
     });
 }
