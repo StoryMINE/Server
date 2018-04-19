@@ -281,6 +281,9 @@
         },
         {
           "$ref": "#/definitions/condition-TimeRange"
+        },
+        {
+          "$ref": "#/definitions/condition-IsRole"
         }
       ]
     },
@@ -470,6 +473,28 @@
         "type",
         "first",
         "last"
+      ],
+      "additionalProperties": false
+    },
+    "condition-IsRole": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "isrole"
+          ]
+        },
+        "role": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "role"
       ],
       "additionalProperties": false
     },

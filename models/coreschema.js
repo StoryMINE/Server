@@ -216,6 +216,13 @@ var CheckCondition = new Schema({
     variable: {type: VariableReference}
 });
 
+var IsRoleCondition = new Schema({
+    id: {type: String, required: true},
+    name: {type: String, required: true},
+    type: {type: String, default: "isrole"},
+    role: {type: String}
+});
+
 // Story ----------------------------------------------------------------------
 
 var Story = new Schema({
@@ -307,6 +314,7 @@ module.exports = {
     LogicalCondition: mongoose.model('LogicalCondition', LogicalCondition),
     LocationCondition: mongoose.model('LocationCondition', LocationCondition),
     CheckCondition: mongoose.model('CheckCondition', CheckCondition),
+    IsRoleCondition: mongoose.model('IsRoleCondition', IsRoleCondition),
     StateScope: mongoose.model('StateScope', StateScope),
     StateLock: mongoose.model('StateLock', StateLock)
 };
