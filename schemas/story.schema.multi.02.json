@@ -22,8 +22,13 @@
       "enum": [
         "published",
         "draft",
-        "review"
+        "review",
+        "preview"
       ]
+    },
+    "publishDate": {
+      "description": "Date the story was published",
+      "type": "string"
     },
     "roles": {
       "description": "The roles available to the participants of the story",
@@ -112,7 +117,6 @@
     "functions",
     "cachedMediaIds",
     "locations",
-    "pagesMapViewSettings",
     "tags",
     "schemaVersion",
     "audience"
@@ -532,6 +536,9 @@
           "$ref": "#/definitions/function-Increment"
         },
         {
+          "$ref": "#/definitions/function-Chain"
+        },
+        {
           "$ref": "#/definitions/function-SetRole"
         }
       ]
@@ -674,6 +681,36 @@
         "type",
         "variable",
         "value"
+      ]
+    },
+    "function-Chain": {
+      "properties": {
+        "conditions": {
+          "$ref": "#/definitions/conditionsReferenceArray"
+        },
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "chain"
+          ]
+        },
+        "functions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/functionReference"
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "conditions",
+        "type",
+        "functions"
       ]
     },
     "location": {
