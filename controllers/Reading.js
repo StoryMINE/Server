@@ -146,26 +146,38 @@ function getStates(req, res, next) {
         return next(error);
     }
 
-    let globalScopePromise = CoreSchema.StoryInstance.findById(readingId).then(storyInstance => storyInstance.storyId)
-        .then(storyId => CoreSchema.StateScope.findOne({storyId: storyId}));
+    let storyIdPromise = CoreSchema.StoryInstance.findById(readingId).then(storyInstance => storyInstance.storyId);
 
-    let sharedScopePromise = CoreSchema.StateScope.findOne({readingId: readingId});
+    storyIdPromise
+    .then(storyId => {
+        if(!storyId) { console.error("No StoryId found for instance, should never happen."); }
+        return {
+            storyId: storyId,
+            readingId: readingId
+        };
+    })
+    .then(ids => Promise.all([
+        Promise.resolve(ids),
+        CoreSchema.StateScope.findOne({storyId: ids.storyId}),
+        CoreSchema.StateScope.findOne({readingId: ids.readingId})
+    ]))
+    .then(promiseResults => {
+        console.log(promiseResults);
 
-    Promise.all([globalScopePromise, sharedScopePromise])
-        .then(scopes => {
-            var globalScope = scopes[0];
-            var sharedScope = scopes[1];
+        var ids = promiseResults[0];
+        var globalScope = promiseResults[1];
+        var sharedScope = promiseResults[2];
 
-            //Note: This shouldn't save.
-            let defaultSharedScope = new CoreSchema.StateScope({readingId: readingId});
-            let defaultGlobalScope = new CoreSchema.StateScope({storyId: readingId});
+        //Note: This shouldn't save.
+        let defaultSharedScope = new CoreSchema.StateScope({readingId: ids.readingId});
+        let defaultGlobalScope = new CoreSchema.StateScope({storyId: ids.storyId});
 
-            res.json({
-               shared: sharedScope || defaultSharedScope,
-               global: globalScope || defaultGlobalScope
-            });
-        })
-        .catch(err => next(err));
+        res.json({
+           shared: sharedScope || defaultSharedScope,
+           global: globalScope || defaultGlobalScope
+        });
+    })
+    .catch(err => next(err));
 }
 
 function hashVariable(namespace, key, value) {
