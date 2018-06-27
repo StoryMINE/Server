@@ -450,7 +450,7 @@
         "id",
         "type",
         "minutes",
-        "tsVariableName"
+        "variable"
       ],
       "additionalProperties": false
     },
