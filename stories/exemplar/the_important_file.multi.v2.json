@@ -1,0 +1,383 @@
+{
+  "schemaVersion": "https://storyplaces.soton.ac.uk/schema/multi/02",
+  "tags": [
+    "Multi-reader Example"
+  ],
+  "locations": [],
+  "conditions": [
+    {
+      "role": "Guard",
+      "type": "isrole",
+      "id": "is_guard"
+    },
+    {
+      "role": "Official",
+      "type": "isrole",
+      "id": "is_official"
+    },
+    { 
+      "id": "guard_exists",
+      "type": "check",
+      "variable": {
+        "namespace": "roles",
+        "scope": "shared",
+        "variable": "GUARD"
+      }
+    },
+    { 
+      "id": "official_exists",
+      "type": "check",
+      "variable": {
+        "namespace": "roles",
+        "scope": "shared",
+        "variable": "OFFICIAL"
+      }
+    },
+    {
+      "id": "no_role",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "is_official", "is_guard" ]
+    },
+    {
+      "id": "no_guard",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "guard_exists" ]
+    },
+    {
+      "id": "no_official",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "official_exists" ]
+    },
+    {
+      "id": "file_read",
+      "type": "check",
+      "variable": {
+        "namespace": "meeting",
+        "scope": "shared",
+        "variable": "file_read"
+      }
+    },
+    {
+      "id": "not_file_read",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "file_read" ]
+    },
+    {
+      "id": "chairman_listened_to",
+      "type": "check",
+      "variable": {
+        "namespace": "meeting",
+        "scope": "shared",
+        "variable": "chairman_listened_to"
+      }
+    },
+    {
+      "id": "not_chairman_listened_to",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "chairman_listened_to" ]
+    },
+    {
+      "id": "guard_listened_to",
+      "type": "check",
+      "variable": {
+        "namespace": "meeting",
+        "scope": "shared",
+        "variable": "guard_listened_to"
+      }
+    },
+    {
+      "id": "not_guard_listened_to",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "guard_listened_to" ]
+    },
+    {
+      "id": "noticed_official",
+      "type": "check",
+      "variable": {
+        "namespace": "meeting",
+        "scope": "shared",
+        "variable": "noticed_official"
+      }
+    },
+    {
+      "id": "not_noticed_official",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "noticed_official" ]
+    },
+    {
+      "id": "ready_to_end",
+      "type": "check",
+      "variable": "ready_to_end"
+    }
+    ],
+  "pages": [
+    {
+      "id": "Role Selection - Guard",
+      "hint": {
+        "direction": "I want to be the guard",
+        "locations": []
+      },
+      "name": "Be the Guard",
+      "pageTransition": "next",
+      "conditions": [
+        "no_role",
+        "no_guard"
+      ],
+      "functions": [
+        "assign_guard_role",
+        "mark_guard_taken"
+      ],
+      "contentRef": "ChooseGuard"
+    },
+    {
+      "id": "Role Selection - Official",
+      "hint": {
+        "direction": "I want to be the official",
+        "locations": []
+      },
+      "name": "Be the Official",
+      "pageTransition": "next",
+      "conditions": [
+        "no_role",
+        "no_official"
+      ],
+      "functions": [
+        "assign_official_role",
+        "mark_official_taken"
+      ],
+      "contentRef": "ChooseOfficial"
+    },
+    {
+      "id": "Read the file",
+      "hint": {
+        "direction": "As you pick up the file, you read out the title.",
+        "locations": []
+      },
+      "name": "Read the file",
+      "pageTransition": "next",
+      "conditions": [
+        "is_guard",
+        "not_file_read"
+      ],
+      "functions": [
+        "set_file_read"
+      ],
+      "contentRef": "Read file"
+    },
+    {
+      "id": "Listen to guard",
+      "hint": {
+        "direction": "The guard picks up a file and begins reading out the title. Tune out of the main conversation and listen.",
+        "locations": []
+      },
+      "name": "Listen to guard",
+      "pageTransition": "next",
+      "conditions": [
+        "is_official",
+        "file_read",
+        "not_guard_listened_to",
+        "not_chairman_listened_to"
+      ],
+      "functions": [
+        "set_guard_listened_to",
+        "set_ready_to_end"
+      ],
+      "contentRef": "Listen to guard"
+    },
+    {
+      "id": "Listen to chairman",
+      "hint": {
+        "direction": "Listen to the chairman present the meeting",
+        "locations": []
+      },
+      "name": "Listen to the chairman present",
+      "pageTransition": "next",
+      "conditions": [
+        "is_official",
+        "not_guard_listened_to",
+        "not_chairman_listened_to"
+      ],
+      "functions": [
+        "set_ready_to_end",
+        "set_chairman_listened_to",
+        "set_guard_ready_to_end"
+      ],
+      "contentRef": "Listen to chairman"
+    },
+    {
+      "id": "Notice the official listening",
+      "hint": {
+        "direction": "As you finish reading, you notice that the official has been listening.",
+        "locations": []
+      },
+      "name": "Notice the official listening",
+      "pageTransition": "next",
+      "conditions": [
+        "is_guard",
+        "guard_listened_to",
+        "not_noticed_official"
+      ],
+      "functions": [
+        "set_ready_to_end",
+        "set_noticed_official"
+      ],
+      "contentRef": "Notice official"
+    },
+    {
+      "pageTransition": "end",
+      "conditions": [
+        "ready_to_end"
+      ],
+      "functions": [],
+      "id": "579b915f89ed4ed466000085",
+      "hint": {
+        "direction": "The story continues...",
+        "locations": []
+      },
+      "name": "Finish",
+      "contentRef": "Finish"
+    }
+  ],
+  "audience": "general",
+  "name": "The Important File - Feedback Example",
+  "cachedMediaIds": [],
+  "description": "",
+  "pagesMapViewSettings": {
+    "map": false,
+    "pageArrows": true,
+    "pageDistance": true
+  },
+  "publishState": "published",
+  "author": "Callum Spawforth",
+  "functions": [
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "Guard",
+      "type": "setrole",
+      "id": "assign_guard_role"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "Official",
+      "type": "setrole",
+      "id": "assign_official_role"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "true",
+      "variable": {
+        "namespace": "roles",
+        "scope": "shared",
+        "variable": "GUARD"
+      },
+      "type": "set",
+      "id": "mark_guard_taken"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "true",
+      "variable": {
+        "namespace": "roles",
+        "scope": "shared",
+        "variable": "OFFICIAL"
+      },
+      "type": "set",
+      "id": "mark_official_taken"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "true",
+      "variable": "ready_to_end",
+      "type": "set",
+      "id": "set_ready_to_end"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "true",
+      "variable": {
+        "scope": "shared",
+        "namespace": "Guard",
+        "variable": "ready_to_end"
+      },
+      "type": "set",
+      "id": "set_guard_ready_to_end"
+    },
+    {
+      "id": "set_file_read",
+      "type": "set",
+      "variable": {
+        "namespace": "meeting",
+        "scope": "shared",
+        "variable": "file_read"
+      },
+      "value": "true",
+      "functions": [],
+      "conditions": []
+    },
+    {
+      "id": "set_chairman_listened_to",
+      "type": "set",
+      "variable": {
+        "namespace": "meeting",
+        "scope": "shared",
+        "variable": "chairman_listened_to"
+      },
+      "value": "true",
+      "functions": [],
+      "conditions": []
+    },
+    {
+      "id": "set_noticed_official",
+      "type": "set",
+      "variable": {
+        "namespace": "meeting",
+        "scope": "shared",
+        "variable": "noticed_official"
+      },
+      "value": "true",
+      "functions": [],
+      "conditions": []
+    },
+    {
+      "id": "set_guard_listened_to",
+      "type": "set",
+      "variable": {
+        "namespace": "meeting",
+        "scope": "shared",
+        "variable": "guard_listened_to"
+      },
+      "value": "true",
+      "functions": [],
+      "conditions": []
+    }
+  ],
+  "content": {
+    "ChooseGuard": "You are the guard, stood in the meeting room. In your hand is a file with 'TOP SECRET' emblazoned on the front.",
+    "ChooseOfficial": "You're a governmental official, in a rather boring meeting. Or it would be, had you not just knocked some top secret documents off of the desk. The guard has picked them up.",
+    "Read file": "You read out the title, 'WORLD DOMINATION IN 5 EASY STEPS'",
+    "Listen to guard": "Focusing your attention on the guard, you hear him mutter the title of the document: 'WORLD DOMINATION IN 5 EASY STEPS'",
+    "Listen to chairman": "The chairman goes on about the decreased tax revenue and how they need cuts to public services to make up the shortfall.",
+    "Notice official": "You spot the official listening, and hastily put the file down."
+  },
+  "roles": [
+    {
+      "id": "Guard"
+    },
+    {
+      "id": "Official"
+    }
+  ]
+}

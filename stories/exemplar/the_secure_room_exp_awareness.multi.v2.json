@@ -1,0 +1,287 @@
+{
+  "schemaVersion": "https://storyplaces.soton.ac.uk/schema/multi/02",
+  "tags": [
+    "Multi-reader Example"
+  ],
+  "locations": [],
+  "conditions": [
+    {
+      "role": "Guard",
+      "type": "isrole",
+      "id": "is_guard"
+    },
+    {
+      "role": "Official",
+      "type": "isrole",
+      "id": "is_official"
+    },
+    { 
+      "id": "guard_exists",
+      "type": "check",
+      "variable": {
+        "namespace": "roles",
+        "scope": "shared",
+        "variable": "GUARD"
+      }
+    },
+    { 
+      "id": "official_exists",
+      "type": "check",
+      "variable": {
+        "namespace": "roles",
+        "scope": "shared",
+        "variable": "OFFICIAL"
+      }
+    },
+    {
+      "id": "no_role",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "is_official", "is_guard" ]
+    },
+    {
+      "id": "no_guard",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "guard_exists" ]
+    },
+    {
+      "id": "no_official",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "official_exists" ]
+    },
+    {
+      "id": "door_unlocked",
+      "type": "check",
+      "variable": { 
+        "namespace": "door",
+        "scope": "shared",
+        "variable": "unlocked" 
+      }
+    },
+    {
+      "id": "door_locked",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "door_unlocked" ]
+    },
+    {
+      "id": "gone_through_door",
+      "type": "check",
+      "variable": "gone_through_door"
+    },
+    {
+      "id": "not_gone_through_door",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "gone_through_door" ]
+    },
+    {
+      "id": "ready_to_end",
+      "type": "check",
+      "variable": "ready_to_end"
+    }
+    ],
+  "pages": [
+    {
+      "id": "Role Selection - Guard",
+      "hint": {
+        "direction": "I want to be the guard",
+        "locations": []
+      },
+      "name": "Be the Guard",
+      "pageTransition": "next",
+      "conditions": [
+        "no_role",
+        "no_guard"
+      ],
+      "functions": [
+        "assign_guard_role",
+        "mark_guard_taken"
+      ],
+      "contentRef": "ChooseGuard"
+    },
+    {
+      "id": "Role Selection - Official",
+      "hint": {
+        "direction": "I want to be the official",
+        "locations": []
+      },
+      "name": "Be the Official",
+      "pageTransition": "next",
+      "conditions": [
+        "no_role",
+        "no_official"
+      ],
+      "functions": [
+        "assign_official_role",
+        "mark_official_taken"
+      ],
+      "contentRef": "ChooseOfficial"
+    },
+    {
+      "id": "Official Go Through Door",
+      "hint": {
+        "direction": "Go through the door marked 'TOP SECRET'",
+        "locations": []
+      },
+      "name": "Go through the door marked 'TOP SECRET' ",
+      "pageTransition": "next",
+      "conditions": [
+        "is_official",
+        "door_unlocked",
+        "not_gone_through_door"
+      ],
+      "functions": [
+        "go_through_door",
+        "set_ready_to_end"
+      ],
+      "contentRef": "Official Go Through Door"
+    },
+    {
+      "id": "Guard Go Through Door",
+      "hint": {
+        "direction": "Go through the door marked 'TOP SECRET'",
+        "locations": []
+      },
+      "name": "Go through the door marked 'TOP SECRET' ",
+      "pageTransition": "next",
+      "conditions": [
+        "is_guard",
+        "door_unlocked",
+        "not_gone_through_door"
+      ],
+      "functions": [
+        "go_through_door",
+        "set_ready_to_end"
+      ],
+      "contentRef": "Guard Go Through Door"
+    },
+    {
+      "id": "Guard Unlock Door",
+      "hint": {
+        "direction": "Insert your thumb into the scanner",
+        "locations": []
+      },
+      "name": "Insert your thumb into the scanner",
+      "pageTransition": "next",
+      "conditions": [
+        "is_guard",
+        "door_locked"
+      ],
+      "functions": [
+        "unlock_door"
+      ],
+      "contentRef": "Guard Unlock Door"
+    },
+    {
+      "pageTransition": "end",
+      "conditions": [
+        "ready_to_end"
+      ],
+      "functions": [],
+      "id": "579b915f89ed4ed466000085",
+      "hint": {
+        "direction": "Finish",
+        "locations": []
+      },
+      "name": "Finish",
+      "contentRef": "Finish"
+    }
+  ],
+  "audience": "general",
+  "name": "The Secure Room - Likelihood and Awareness Example",
+  "cachedMediaIds": [],
+  "description": "",
+  "pagesMapViewSettings": {
+    "map": false,
+    "pageArrows": true,
+    "pageDistance": true
+  },
+  "publishState": "published",
+  "author": "Callum Spawforth",
+  "functions": [
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "Guard",
+      "type": "setrole",
+      "id": "assign_guard_role"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "Official",
+      "type": "setrole",
+      "id": "assign_official_role"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "true",
+      "variable": {
+        "namespace": "roles",
+        "scope": "shared",
+        "variable": "GUARD"
+      },
+      "type": "set",
+      "id": "mark_guard_taken"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "true",
+      "variable": {
+        "namespace": "roles",
+        "scope": "shared",
+        "variable": "OFFICIAL"
+      },
+      "type": "set",
+      "id": "mark_official_taken"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "true",
+      "variable": "ready_to_end",
+      "type": "set",
+      "id": "set_ready_to_end"
+    },
+    {
+      "id": "unlock_door",
+      "type": "set",
+      "variable": { 
+        "namespace": "door",
+        "scope": "shared",
+        "variable": "unlocked" 
+      },
+      "value": "true",
+      "functions": [],
+      "conditions": []
+    },
+    {
+      "id": "go_through_door",
+      "type": "set",
+      "variable": "gone_through_door",
+      "value": "true",
+      "functions": [],
+      "conditions": []
+    }
+  ],
+  "content": {
+    "ChooseGuard": "You step quickly through the corridors of the cabinet office with a practiced familiarity. The ministry official keeps pace close behind, a stern expression on her face. After travelling down several flights of stairs, you come to a steel door recessed into the wall. Emblazoned on the front in large, red letters are the words 'TOP SECRET'. Beside it is a small, blinking metal scanner with a picture of a thumb on.",
+    "ChooseOfficial": "You step quickly through the corridors of the cabinet office, barely keeping pace with the silent guard. After travelling down several flights of stairs, you come to a steel door recessed into the wall. Emblazoned on the front in large, red letters are the words 'TOP SECRET'. Beside it is a small, blinking metal scanner with a picture of a thumb on. The guard begins to move towards it purposefully.",
+    "Official Go Through Door": "<span style='color: blue'>[The Guard reader chose to unlock the door]</span><br/><br/>The guard reaches down to the blinking scanner beside the door, inserting a thumb into the glowing recepticle. Moments pass. A mechanical voice echoes down the corridor 'ACCESS GRANTED', as the door reverberates with a lound clunk before sliding open. Following the guard's lead, you step into the dimly lit room.",
+    "Guard Unlock Door": "You reach down to the blinking scanner beside the door and insert a thumb into the glowing recepticle. Moments pass. A mechanical voice echoes down the corridor 'ACCESS GRANTED', as the door reverberates with a lound clunk before sliding open.",
+    "Guard Go Through Door": "You step through the open door ahead of the official into a dimly lit room."
+  },
+  "roles": [
+    {
+      "id": "Guard"
+    },
+    {
+      "id": "Official"
+    }
+  ]
+}

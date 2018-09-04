@@ -1,0 +1,313 @@
+{
+  "schemaVersion": "https://storyplaces.soton.ac.uk/schema/multi/02",
+  "tags": [
+    "Multi-reader Example"
+  ],
+  "locations": [],
+  "conditions": [
+    {
+      "role": "Guard",
+      "type": "isrole",
+      "id": "is_guard"
+    },
+    {
+      "role": "Official",
+      "type": "isrole",
+      "id": "is_official"
+    },
+    { 
+      "id": "guard_exists",
+      "type": "check",
+      "variable": {
+        "namespace": "roles",
+        "scope": "shared",
+        "variable": "GUARD"
+      }
+    },
+    { 
+      "id": "official_exists",
+      "type": "check",
+      "variable": {
+        "namespace": "roles",
+        "scope": "shared",
+        "variable": "OFFICIAL"
+      }
+    },
+    {
+      "id": "no_role",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "is_official", "is_guard" ]
+    },
+    {
+      "id": "no_guard",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "guard_exists" ]
+    },
+    {
+      "id": "no_official",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "official_exists" ]
+    },
+    {
+      "id": "files_knocked",
+      "type": "check",
+      "variable": { 
+        "namespace": "room",
+        "scope": "shared",
+        "variable": "files_knocked"
+      }
+    },
+    {
+      "id": "not_files_knocked",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "files_knocked" ]
+    },
+    {
+      "id": "timepassed_files_knocked",
+      "type": "timepassed",
+      "variable": {
+          "namespace": "room",
+          "scope": "shared",
+          "variable": "files_knocked"
+      },
+      "minutes": 0.085
+    },
+    {
+      "id": "not_timepassed_files_knocked",
+      "type":"logical",
+      "operand": "NOR",
+      "conditions": [ "timepassed_files_knocked" ]
+    },
+    {
+      "id": "files_dealt_with",
+      "type": "check",
+      "variable": {
+        "namespace": "room",
+        "scope": "shared",
+        "variable": "files_dealt_with"
+      }
+    },
+    {
+      "id": "not_files_dealt_with",
+      "type": "logical",
+      "operand": "NOR",
+      "conditions": [ "files_dealt_with" ]
+    },
+    {
+      "id": "ready_to_end",
+      "type": "check",
+      "variable": "ready_to_end"
+    }
+    ],
+  "pages": [
+    {
+      "id": "Role Selection - Guard",
+      "hint": {
+        "direction": "I want to be the guard",
+        "locations": []
+      },
+      "name": "Be the Guard",
+      "pageTransition": "next",
+      "conditions": [
+        "no_role",
+        "no_guard"
+      ],
+      "functions": [
+        "assign_guard_role",
+        "mark_guard_taken"
+      ],
+      "contentRef": "ChooseGuard"
+    },
+    {
+      "id": "Role Selection - Official",
+      "hint": {
+        "direction": "I want to be the official",
+        "locations": []
+      },
+      "name": "Be the Official",
+      "pageTransition": "next",
+      "conditions": [
+        "no_role",
+        "no_official"
+      ],
+      "functions": [
+        "assign_official_role",
+        "mark_official_taken"
+      ],
+      "contentRef": "ChooseOfficial"
+    },
+    {
+      "id": "Knock some files off of the table.",
+      "hint": {
+        "direction": "Accidentally knock some files off of the table as you sit down",
+        "locations": []
+      },
+      "name": "Knock some files off of the table.",
+      "pageTransition": "next",
+      "conditions": [
+        "is_official",
+        "not_files_knocked"
+      ],
+      "functions": [
+        "knock_files_off_table",
+        "set_ready_to_end"
+      ],
+      "contentRef": "Knock files Off Table"
+    },
+    {
+      "id": "Catch Files",
+      "hint": {
+        "direction": "Catch some files as they fall off of the table",
+        "locations": []
+      },
+      "name": "Catch Files",
+      "pageTransition": "next",
+      "conditions": [
+        "is_guard",
+        "files_knocked",
+        "not_timepassed_files_knocked",
+        "not_files_dealt_with"
+      ],
+      "functions": [
+        "set_ready_to_end",
+        "deal_with_files"
+      ],
+      "contentRef": "Catch Files"
+    },
+    {
+      "id": "Pick Files Off Floor",
+      "hint": {
+        "direction": "Pick up the files from the floor and put them back on the table.",
+        "locations": []
+      },
+      "name": "Pick up the files from the floor",
+      "pageTransition": "next",
+      "conditions": [
+        "is_guard",
+        "files_knocked",
+        "timepassed_files_knocked",
+        "not_files_dealt_with"
+      ],
+      "functions": [
+        "set_ready_to_end",
+        "deal_with_files"
+      ],
+      "contentRef": "Pick Files Off Floor"
+    },
+    {
+      "pageTransition": "end",
+      "conditions": [
+        "ready_to_end"
+      ],
+      "functions": [],
+      "id": "579b915f89ed4ed466000085",
+      "hint": {
+        "direction": "The story continues...",
+        "locations": []
+      },
+      "name": "Finish",
+      "contentRef": "Finish"
+    }
+  ],
+  "audience": "general",
+  "name": "The Meeting - Synchronous Reading Example",
+  "cachedMediaIds": [],
+  "description": "",
+  "pagesMapViewSettings": {
+    "map": false,
+    "pageArrows": true,
+    "pageDistance": true
+  },
+  "publishState": "published",
+  "author": "Callum Spawforth",
+  "functions": [
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "Guard",
+      "type": "setrole",
+      "id": "assign_guard_role"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "Official",
+      "type": "setrole",
+      "id": "assign_official_role"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "true",
+      "variable": {
+        "namespace": "roles",
+        "scope": "shared",
+        "variable": "GUARD"
+      },
+      "type": "set",
+      "id": "mark_guard_taken"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "true",
+      "variable": {
+        "namespace": "roles",
+        "scope": "shared",
+        "variable": "OFFICIAL"
+      },
+      "type": "set",
+      "id": "mark_official_taken"
+    },
+    {
+      "functions": [],
+      "conditions": [],
+      "value": "true",
+      "variable": "ready_to_end",
+      "type": "set",
+      "id": "set_ready_to_end"
+    },
+    {
+      "id": "deal_with_files",
+      "type": "set",
+      "variable": {
+        "namespace": "room",
+        "scope": "shared",
+        "variable": "files_dealt_with"
+      },
+      "value": "true",
+      "functions": [],
+      "conditions": []
+    },
+    {
+      "id": "knock_files_off_table",
+      "type": "settimestamp",
+      "variable": {
+        "namespace": "room",
+        "scope": "shared",
+        "variable": "files_knocked"
+      },
+      "functions": [],
+      "conditions": []
+    }
+  ],
+  "content": {
+    "ChooseGuard": "You enter the room following the official.",
+    "ChooseOfficial": "You enter the room and begin to sit down. At last minute, you notice some precariously positioned files on the edge of the table.",
+    "Knock Files Off Table": "You knock the files off of the table.",
+    "Catch Files": "As the Official knocks the files, you swiftly duck down and grab them before they hit the floor.",
+    "Pick Files Off Floor": "The official knocks some files from the table. You try to grab them, but you're too slow and they hit the floor. Reaching down, you grab them and put them back on the table."
+  },
+  "roles": [
+    {
+      "id": "Guard"
+    },
+    {
+      "id": "Official"
+    }
+  ]
+}
